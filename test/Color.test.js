@@ -96,17 +96,24 @@ describe('deployment',async() => {
          })
     })
     describe('approve test', async() => {
-        it('Approves another address to transfer the given token ID',async() => {
-        const approve = await contract.approve(accounts[1],3, {from: accounts[0]});
-        const approvedAddress = await contract.getApproved.call(3);
-        assert.equal(approvedAddress,accounts[1],'Approval for transaction successful');
-        })
+        
         it('No approval if the approving address is not of the owner or already approved address', async () => {
-            await contract.approve(accounts[1], 3, {from: accounts[5]}).should.be.rejected;
+            await truffleAssert.reverts(contract.approve(accounts[5], 3, {from: accounts[5]}),'approve caller is not owner nor approved for all');
           })
            
-    
     })
+    describe("getApproved test", async () => {
+        
+        it('Fetch approval info for a token id',async() => {
+            const approve = await contract.approve(accounts[1],3, {from: accounts[0]});
+            const approvedAddress = await contract.getApproved.call(3);
+            assert.equal(approvedAddress,accounts[1],'Fetched Approval address as expected');
+            })
+    
+        it("Should not fetch approval info for nonexistent token id ", async () => {
+          await truffleAssert.reverts(contract.getApproved.call(11),'approved query for nonexistent token');
+        });
+      });
     describe('setApprovalForAll test', async() => {
     it('to check if event emitted for setApprovalForAll',async() => {
         //gets Approved Address for exisitng token id
