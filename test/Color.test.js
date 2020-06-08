@@ -39,9 +39,13 @@ describe('deployment',async() => {
             const totalSupply = await contract.totalSupply();
             //SUCCESS
             assert.equal(totalSupply,1);
-            console.log(result)
-                       
-        })
+            const event = result.logs[0].args;
+            assert.equal(event.tokenId.toNumber(),0,'id is correct');
+            assert.equal(event.from,'0x0000000000000000000000000000000000000000','from is correct');
+            assert.equal(event.to,accounts[0],'to is correct');
+            //FAILURE: cannot mint same color again
+		await contract.mint('#EC0588').should.be.rejected;
+       })
     })
     
 })
