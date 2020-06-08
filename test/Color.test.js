@@ -96,6 +96,11 @@ describe('deployment',async() => {
          })
     })
     describe('approve test', async() => {
+        it("Set transaction approval to some address", async () => {
+           const approve = await contract.approve(accounts[1], 3, {from: accounts[0]});
+           const setAddress = await contract.getApproved.call(3);
+           assert.equal(accounts[1],setAddress,'Address approved for transaction approval');
+          })
         
         it('No approval if the approving address is not of the owner or already approved address', async () => {
             await truffleAssert.reverts(contract.approve(accounts[5], 3, {from: accounts[5]}),'approve caller is not owner nor approved for all');
