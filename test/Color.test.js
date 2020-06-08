@@ -92,6 +92,13 @@ describe('deployment',async() => {
             await contract.ownerOf.call(11).should.be.rejected;
          })
     })
+    describe('approve test', async() => {
+        it('Approves another address to transfer the given token ID',async() => {
+        const approve = await contract.approve(accounts[1],3, {from: accounts[0]});
+        const approvedAddress = await contract.getApproved.call(3);
+        assert.equal(approvedAddress,accounts[1],'Approval for transaction successful');
+        })
     
+    })
 })
 })
