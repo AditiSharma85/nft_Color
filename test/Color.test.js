@@ -77,7 +77,8 @@ describe('deployment',async() => {
             //Minter Balance = 4 due to minting in earlier test.
             const balanceOfMinter = await contract.balanceOf.call(accounts[0]);
             assert.equal(balanceOfMinter, 4 , 'Balance of Minter as expected');
-    
+        })
+        it('Zero balance for a non minter ', async () => {
             //Non-Minter balance = 0 Not yet minted.
             const balanceofNonMinter = await contract.balanceOf(accounts[1]);
             assert.equal(balanceofNonMinter, 0 , 'Balance of Non Minter is as expected');
@@ -88,6 +89,8 @@ describe('deployment',async() => {
             //Owner should be identified for minted token id
             const ownerOf = await contract.ownerOf.call(3);
             assert.equal(ownerOf,accounts[0],'Owner as expected for exisiting token id');
+        })
+         it('No owner for non minted token id', async () => {
             //No Owner for non minted token id
             await contract.ownerOf.call(11).should.be.rejected;
          })
@@ -98,7 +101,19 @@ describe('deployment',async() => {
         const approvedAddress = await contract.getApproved.call(3);
         assert.equal(approvedAddress,accounts[1],'Approval for transaction successful');
         })
+        it('No approval if the approving address is not of the owner', async () => {
+            await contract.approve(accounts[1], 3, {from: accounts[5]}).should.be.rejected;
+          })
+        it('to check if event emitted for setApprovalForAll',async() => {
+            const setApprovalForAll = await contract.setApprovalForAll(accounts[1],true);
+            truffleAssert.eventEmitted(setApprovalForAll, 'ApprovalForAll');
+        })
+    
+
+        
+    
+    })
     
     })
 })
-})
+
