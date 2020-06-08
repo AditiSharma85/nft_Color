@@ -5,7 +5,8 @@ require('chai')
 const truffleAssert = require('truffle-assertions');
 
 contract('ColorToken',(accounts) => {
-	let contract;
+    let contract;
+    let erc721Id='0x80ac58cd';
 
 	before(async () => {
 		contract = await ColorToken.deployed();
@@ -20,7 +21,13 @@ describe('deployment',async() => {
 		assert.notEqual(address, 0x0);
 		assert.notEqual(address, null);
 		assert.notEqual(address, undefined);
-	})
+    })
+    describe("ERC 721 compliance", async () => {
+        it("Compiles to ERC721 token standards", async () => {
+          const erc721Complied = await contract.supportsInterface.call(erc721Id);
+          assert.equal(erc721Complied, true, 'ColorToken is compliant with ERC721 standards');
+        })
+      })
 
 	it('has a name', async () => {
 		const name = await contract.name();
@@ -46,6 +53,35 @@ describe('deployment',async() => {
             //FAILURE: cannot mint same color again
 		await contract.mint('#EC0588').should.be.rejected;
        })
+    })
+    describe('indexing', async()=> {
+        it('lists colors', async()=>{
+            //Mint 3 more Tokens
+            await contract.mint('#EC0600') 
+            await contract.mint('#FFFFFF') 
+            await contract.mint('#000000')  
+            const totalSupply = await contract.totalSupply();
+            let color
+            let result = []
+
+            for (var i=1; i <= totalSupply; i++){
+                color = await contract.colors(i-1)
+                result.push(color)
+            }
+            let expected =['#EC0588', '#EC0600', '#FFFFFF' , '#000000']
+            assert.equal(result.join(','), expected.join(','))
+        })
+    })
+    describe('balanceOf test', async() => {
+        it('to check balance for minter and non minter', async() => {
+            //Minter Balance = 4 due to minting in earlier test.
+            const balanceOfMinter = await contract.balanceOf.call(accounts[0]);
+            assert.equal(balanceOfMinter, 4 , 'Balance of Minter as expected');
+    
+            //Non-Minter balance = 0 Not yet minted.
+            const balanceofNonMinter = await contract.balanceOf(accounts[1]);
+            assert.equal(balanceofNonMinter, 0 , 'Balance of Non Minter is as expected');
+        })
     })
     
 })
