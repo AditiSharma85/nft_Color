@@ -98,11 +98,7 @@ contract("ColorToken", (accounts) => {
       it("to check for the correct owner", async () => {
         //Owner should be identified for minted token id
         const ownerOf = await contract.ownerOf.call(3);
-        assert.equal(
-          ownerOf,
-          accounts[0],
-          "Owner as expected for exisiting token id"
-        );
+        assert.equal(ownerOf,accounts[0],'Owner as expected for exisiting token id');
       });
       it("No owner for non minted token id", async () => {
         //No Owner for non minted token id
@@ -115,18 +111,11 @@ contract("ColorToken", (accounts) => {
           from: accounts[0],
         });
         const setAddress = await contract.getApproved.call(3);
-        assert.equal(
-          accounts[1],
-          setAddress,
-          "Address approved for transaction approval"
-        );
+        assert.equal(accounts[1],setAddress,'Address approved for transaction approval');
       });
 
       it("No approval if the approving address is not of the owner or already approved address", async () => {
-        await truffleAssert.reverts(
-          contract.approve(accounts[5], 3, { from: accounts[5] }),
-          "approve caller is not owner nor approved for all"
-        );
+        await truffleAssert.reverts(contract.approve(accounts[5], 3, { from: accounts[5] }),'approve caller is not owner nor approved for all');
       });
     });
     describe("getApproved test", async () => {
@@ -156,7 +145,7 @@ contract("ColorToken", (accounts) => {
           accounts[1],
           true
         );
-        truffleAssert.eventEmitted(setApprovalForAll, "ApprovalForAll");
+        truffleAssert.eventEmitted(setApprovalForAll, 'ApprovalForAll');
       });
       it("to check if approving your own account", async () => {
         //reverts for self approval
@@ -168,7 +157,7 @@ contract("ColorToken", (accounts) => {
             await contract.mint("#FFF444");
             await contract.transferFrom(accounts[0], accounts[1], 4);
             const ApprovedOwner = await contract.ownerOf.call(4);
-            assert.equal(ApprovedOwner, accounts[1], "Owner verified");
+            assert.equal(ApprovedOwner, accounts[1], 'Owner verified');
           })
         })
     describe("safeTransferFrom test", async=>{
@@ -178,6 +167,12 @@ contract("ColorToken", (accounts) => {
             await contract.safeTransferFrom(accounts[0],accounts[1],3);
             const owner2 = await contract.ownerOf.call(3);
             assert.equal(owner2,accounts[1],'Token safely transferred');
+        })
+        it('Ensures safe transfer using contract info', async() =>{
+            await contract.mint("#000AAA");
+            await contract.safeTransferFrom(accounts[0], accounts[1], 5, '0x053222');
+            const owner = await contract.ownerOf.call(5);
+             assert.equal(owner,accounts[1],'Owner verified for Safe transfer');
         })
       })
   })
