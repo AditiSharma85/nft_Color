@@ -101,18 +101,24 @@ describe('deployment',async() => {
         const approvedAddress = await contract.getApproved.call(3);
         assert.equal(approvedAddress,accounts[1],'Approval for transaction successful');
         })
-        it('No approval if the approving address is not of the owner', async () => {
+        it('No approval if the approving address is not of the owner or already approved address', async () => {
             await contract.approve(accounts[1], 3, {from: accounts[5]}).should.be.rejected;
           })
-        it('to check if event emitted for setApprovalForAll',async() => {
-            const setApprovalForAll = await contract.setApprovalForAll(accounts[1],true);
-            truffleAssert.eventEmitted(setApprovalForAll, 'ApprovalForAll');
-        })
-    
-
-        
+           
     
     })
+    describe('setApprovalForAll test', async() => {
+    it('to check if event emitted for setApprovalForAll',async() => {
+        //gets Approved Address for exisitng token id
+        const setApprovalForAll = await contract.setApprovalForAll(accounts[1],true);
+        truffleAssert.eventEmitted(setApprovalForAll, 'ApprovalForAll');
+    })
+    it('to check if approving your own account',async() => {
+        //reverts for self approval
+        await contract.setApprovalForAll(accounts[0],true).should.be.rejected;
+        
+    })
+})
     
     })
 })
