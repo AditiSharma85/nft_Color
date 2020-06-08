@@ -83,6 +83,15 @@ describe('deployment',async() => {
             assert.equal(balanceofNonMinter, 0 , 'Balance of Non Minter is as expected');
         })
     })
+    describe('ownerOf test', async() => {
+        it('to check for the correct owner', async() => {
+            //Owner should be identified for minted token id
+            const ownerOf = await contract.ownerOf.call(3);
+            assert.equal(ownerOf,accounts[0],'Owner as expected for exisiting token id');
+            //No Owner for non minted token id
+            await contract.ownerOf.call(11).should.be.rejected;
+         })
+    })
     
 })
 })
